@@ -1,0 +1,17 @@
+[workspace]
+
+[package]
+name = "kvs"
+version = "0.1.0"
+authors = ["Guillaume de Rouville <guillaume.derouville@gmail.com>"]
+description = "A key-value store"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = { version = "4.2.1", features = ["derive"] }
+
+[dev-dependencies]
+assert_cmd = "0.11.0"
+predicates = "1.0.0"

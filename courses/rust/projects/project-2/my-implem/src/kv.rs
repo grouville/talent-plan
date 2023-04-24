@@ -8,7 +8,7 @@ use std::path::Path;
 pub struct KvStore {
     pub store: HashMap<String, u64>,
     writer: BufWriter<File>,
-    reader: BufWriter<File>,
+    reader: BufReader<File>,
     offset: u64,
 }
 
@@ -48,10 +48,9 @@ impl KvStore {
             }
             offset += cmd_bytes.len() as u64;
         }
-        // println!("Offset: {:?}", store);
 
         let writer = BufWriter::new(log_file.try_clone()?);
-        let reader = BufWriter::new(log_file.try_clone()?);
+        let reader = BufReader::new(log_file.try_clone()?);
 
         Ok(KvStore {
             store,
@@ -77,25 +76,21 @@ impl KvStore {
         serde_json::to_writer(&mut self.writer, &cmd)?;
         self.writer.flush()?;
 
+        // add to hashmap
+        self.store.insert(key, offset as u64);
+
+        // compute new offset
         let cmd_bytes = serde_json::to_vec(&cmd)?;
+        self.offset = offset + cmd_bytes.len() as u64;
 
-        // insert in the store
-        self.store.insert(key, offset + cmd_bytes.len() as u64);
-
-        // Get the len of the serialized command
-        // println!("Offset_set: {}", self.offset);
         Ok(())
     }
 
     pub fn get(&mut self, key: String) -> Result<Option<String>> {
-        // println!("Offset_get_crap: {:?}", self.store);
         match self.store.get(&key) {
             Some(offset) => {
-                // println!("Offset: {}", offset);
-
-                let mut reader = BufReader::new(self.reader.get_ref());
-                reader.seek(SeekFrom::Start(offset.clone()))?;
-                let mut deserializer = serde_json::Deserializer::from_reader(reader);
+                self.reader.seek(SeekFrom::Start(offset.clone()))?;
+                let mut deserializer = serde_json::Deserializer::from_reader(&mut self.reader);
 
                 let cmd_result = Command::deserialize(&mut deserializer);
 

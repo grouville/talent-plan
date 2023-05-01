@@ -9,6 +9,16 @@ pub enum MyError {
     Io(#[from] io::Error),
     #[error("Serialization error: {0}")]
     Serde(#[from] serde_json::Error),
+    #[error("Regex error: {0}")]
+    RegexError(regex::Error),
+    #[error("Unknown error")]
+    UnknownError,
 }
 
 pub type Result<T> = std::result::Result<T, MyError>;
+
+impl From<regex::Error> for MyError {
+    fn from(error: regex::Error) -> Self {
+        MyError::RegexError(error)
+    }
+}

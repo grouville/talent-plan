@@ -1,0 +1,1 @@
+As there is no simple way to use Serde with RESP format as Serde is designed for JSON, TOML, YAML ... the client implementation work with provided server 

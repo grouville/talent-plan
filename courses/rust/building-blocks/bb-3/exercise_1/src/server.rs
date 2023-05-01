@@ -1,11 +1,11 @@
-use std::io::{BufRead, BufReader, Write};
+use std::io::{Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 fn handle_client(mut stream: TcpStream) {
-    let mut reader = BufReader::new(&stream);
-    let mut buffer = String::new();
-    reader.read_line(&mut buffer).unwrap();
-    if buffer.starts_with("*1\r\n$4\r\nPING\r\n") {
+    let mut buffer = vec![0u8; 14];
+    stream.read_exact(&mut buffer).unwrap();
+    let command = String::from_utf8_lossy(&buffer);
+    if command == "*1\r\n$4\r\nPING\r\n" {
         stream.write_all(b"+PONG\r\n").unwrap();
     }
 }

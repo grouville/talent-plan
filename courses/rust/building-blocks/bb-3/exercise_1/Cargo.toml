@@ -1,0 +1,16 @@
+[package]
+name = "exercise_1"
+version = "0.1.0"
+authors = ["Guillaume de Rouville <guillaume.derouville@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "client"
+path = "src/client.rs"
+
+[[bin]]
+name = "server"
+path = "src/server.rs"
+
